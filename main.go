@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	_ "fmt"
+	"math/rand"
 	"time"
 )
 
@@ -13,6 +13,9 @@ type State struct {
 
 func NewState(size int) *State {
 	cells := make([]bool, size*size)
+	for i := 0; i < len(cells); i++ {
+		cells[i] = rand.Intn(2) == 1
+	}
 	return &State{cells: cells, size: size}
 }
 
@@ -51,6 +54,18 @@ func (s State) Print() {
 	}
 }
 
+func (s State) AliveNeighborCount(x int, y int) int {
+	// TODO get this to work
+	relPos := [8](int, int) {(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)}
+	counter := 0
+	for index, (xRel, yRel) := range relPos {
+		if s.Get(x+xRel, y+yRel) {
+			counter++
+		}
+	}
+	return counter
+}
+
 func loop(state *State, loopNo int) {
 	fmt.Print("\033[H\033[2J")
 
@@ -63,6 +78,7 @@ func loop(state *State, loopNo int) {
 
 func main() {
 	const size = 16
+	rand.Seed(time.Now().UnixNano())
 	s := NewState(size)
 	loop(s, 0)
 }
