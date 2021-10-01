@@ -11,6 +11,11 @@ type State struct {
 	size  int
 }
 
+func NewState(size int) *State {
+	cells := make([]bool, size*size)
+	return &State{cells: cells, size: size}
+}
+
 func (s State) Index(x int, y int) int {
 	if x < 0 {
 		x = s.size - 1
@@ -26,28 +31,30 @@ func (s State) Index(x int, y int) int {
 }
 
 func (s State) Set(x int, y int, state bool) {
-	const z = 0
-
+	s.cells[s.Index(x, y)] = state
 }
 
 func (s State) Get(x int, y int) bool {
-	return true
+	return s.cells[s.Index(x, y)]
 }
 
-// Rules
-// - Is dead & = 3 live neighbors --> Live
-// - Is live & < 2 live neighbors --> Dies
-// - Is live & 2 | 3 live neighbors --> Live
-// - Is live & > 3 live neighbors --> Dies
+func (s State) Print() {
+	for x := 0; x < s.size; x++ {
+		for y := 0; y < s.size; y++ {
+			if s.Get(x, y) {
+				fmt.Print("\u2588")
+			} else {
+				fmt.Print(" ")
+			}
+		}
+		fmt.Println("")
+	}
+}
 
-// X X X
-// X O X
-// X X X
-
-func loop(state State, loopNo int) {
+func loop(state *State, loopNo int) {
 	fmt.Print("\033[H\033[2J")
 
-	fmt.Println(state)
+	state.Print()
 	fmt.Println("Loop #", loopNo)
 
 	time.Sleep(1 * time.Second)
@@ -55,5 +62,7 @@ func loop(state State, loopNo int) {
 }
 
 func main() {
-	loop(_, 0)
+	const size = 16
+	s := NewState(size)
+	loop(s, 0)
 }
